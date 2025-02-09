@@ -6,14 +6,28 @@
  * You can learn more about the next-sanity package here:
  * https://github.com/sanity-io/next-sanity
  */
-
+// app/studio/[[...tool]]/page.tsx
+import dynamic from 'next/dynamic'
 import { NextStudio } from 'next-sanity/studio'
 import config from '../../../sanity.config'
 
-export const dynamic = 'force-static'
+// Remove this line - Studio requires client-side rendering
+// export const dynamic = 'force-static'
 
-export { metadata, viewport } from 'next-sanity/studio'
+// Use dynamic import with SSR disabled
+const StudioPage = dynamic(
+  () => import('next-sanity/studio').then((mod) => mod.NextStudio),
+  {
+    ssr: false,
+    loading: () => <NextStudio config={config} />,
+  }
+)
 
-export default function StudioPage() {
-  return <NextStudio config={config} />
+// Optional: Custom metadata instead of importing
+export const metadata = {
+  title: 'Sanity Studio',
+}
+
+export default function Studio() {
+  return <StudioPage config={config} />
 }
